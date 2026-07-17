@@ -43,7 +43,7 @@ class MLP(nn.Module):
     def forward(self, x):
         return self.down(F.silu(self.gate(x)) * self.up(x))
 
-class DeltaNet(nn.Module):
+class FlashAttention(nn.Module):
     def __init__(self, config):
         super().__init__()
         self.n_head = config.n_head
@@ -68,7 +68,7 @@ class GatedBlock(nn.Module):
         self.ln_1 = RMSNorm(config.n_embd)
         self.ln_2 = RMSNorm(config.n_embd)
         self.mlp = MLP(config)
-        self.attn = DeltaNet(config)
+        self.attn = FlashAttention(config)
         self.res_scale = 1.0 / math.sqrt(2.0 * max(1, layer_idx))
         self.dropout = nn.Dropout(config.dropout)
     def forward(self, x):
